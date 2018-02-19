@@ -64,25 +64,13 @@ fn tessellate_corners(p : &[Vec3], f : &[f32]) -> Mesh {
     if edges == 0 {
         Mesh::empty()
     } else {
-        let mut i = (0..12).map(|i| {
-            if (edges >> i) & 1 == 0 {
-                None
-            } else {
-                let (v0, v1) = EDGES[i];
-                let (ref p0, ref p1) = (&p[v0 as usize], &p[v1 as usize]);
-                let (f0, f1) = (f[v0 as usize], f[v1 as usize]);
-                Some( (
-                    p0.0 - f0 * (p1.0 - p0.0) / (f1 - f0),
-                    p0.1 - f0 * (p1.1 - p0.1) / (f1 - f0),
-                    p0.2 - f0 * (p1.2 - p0.2) / (f1 - f0)
-                ) )
-            }
-        } );
         let vmap = [
-            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
-            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
-            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
-            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
+            edge_intersection(edges, 0, p, f), edge_intersection(edges, 1, p, f),
+            edge_intersection(edges, 2, p, f), edge_intersection(edges, 3, p, f),
+            edge_intersection(edges, 4, p, f), edge_intersection(edges, 5, p, f),
+            edge_intersection(edges, 6, p, f), edge_intersection(edges, 7, p, f),
+            edge_intersection(edges, 8, p, f), edge_intersection(edges, 9, p, f),
+            edge_intersection(edges, 10, p, f), edge_intersection(edges, 11, p, f),
         ];
 
         let mut inds = Vec::with_capacity(15);
@@ -105,11 +93,27 @@ fn tessellate_corners(p : &[Vec3], f : &[f32]) -> Mesh {
     }
 }
 
+#[inline]
+fn edge_intersection(edges : usize, i : usize, p : &[Vec3], f : &[f32]) -> Option<(f32, f32, f32)> {
+    if (edges >> i) & 1 == 0 {
+        None
+    } else {
+        let (v0, v1) = EDGES[i];
+        let (ref p0, ref p1) = (&p[v0], &p[v1 ]);
+        let (f0, f1) = (f[v0], f[v1]);
+        Some( (
+            p0.0 - f0 * (p1.0 - p0.0) / (f1 - f0),
+            p0.1 - f0 * (p1.1 - p0.1) / (f1 - f0),
+            p0.2 - f0 * (p1.2 - p0.2) / (f1 - f0)
+        ) )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
+    #[test] #[should_panic]
     fn it_works() {
         let sfield = SphereField::new(10.0);
         let _mesh = create_mesh(
@@ -117,6 +121,76 @@ mod tests {
             &Bounds((-10.0, -10.0, -10.0), (10.0, 10.0, 10.0)),
             &Vec3(1.0, 1.0, 1.0),
         );
+    }
+
+    #[test]
+    fn test_edge_isect() {
+        let p = [
+            Vec3(0.0,0.0,0.0),
+            Vec3(1.0,0.0,0.0),
+            Vec3(1.0,0.0,1.0),
+            Vec3(0.0,0.0,1.0),
+
+            Vec3(0.0,1.0,0.0),
+            Vec3(1.0,1.0,0.0),
+            Vec3(1.0,1.0,1.0),
+            Vec3(0.0,1.0,1.0),
+        ];
+
+        // Intersection is on YZ plane in middle of the unit cube
+        assert_eq!( edge_intersection(1, 0, &p, &[
+            -1.0, 1.0, 1.0, -1.0,
+            -1.0, 1.0, 1.0, -1.0,
+        ]), Some((0.5, 0.0, 0.0)) );
+        assert_eq!( edge_intersection(0x3ff, 2, &p, &[
+            -1.0, 1.0, 1.0, -1.0,
+            -1.0, 1.0, 1.0, -1.0,
+        ]), Some((0.5, 0.0, 1.0)) );
+        assert_eq!( edge_intersection(0x3ff, 4, &p, &[
+            -1.0, 1.0, 1.0, -1.0,
+            -1.0, 1.0, 1.0, -1.0,
+        ]), Some((0.5, 1.0, 0.0)) );
+        assert_eq!( edge_intersection(0x3ff, 6, &p, &[
+            -1.0, 1.0, 1.0, -1.0,
+            -1.0, 1.0, 1.0, -1.0,
+        ]), Some((0.5, 1.0, 1.0)) );
+
+        // Intersection is on XY plane in middle of unit cube
+        assert_eq!( edge_intersection(0x3ff, 1, &p, &[
+            -1.0,-1.0, 1.0, 1.0,
+            -1.0,-1.0, 1.0, 1.0,
+        ]), Some((1.0, 0.0, 0.5)) );
+        assert_eq!( edge_intersection(0x3ff, 3, &p, &[
+            -1.0,-1.0, 1.0, 1.0,
+            -1.0,-1.0, 1.0, 1.0,
+        ]), Some((0.0, 0.0, 0.5)) );
+        assert_eq!( edge_intersection(0x3ff, 5, &p, &[
+            -1.0,-1.0, 1.0, 1.0,
+            -1.0,-1.0, 1.0, 1.0,
+        ]), Some((1.0, 1.0, 0.5)) );
+        assert_eq!( edge_intersection(0x3ff, 7, &p, &[
+            -1.0,-1.0, 1.0, 1.0,
+            -1.0,-1.0, 1.0, 1.0,
+        ]), Some((0.0, 1.0, 0.5)) );
+
+        // Intersection is on XZ plane in the middle of unit cube
+        assert_eq!( edge_intersection(0x3ff, 8, &p, &[
+            -1.0,-1.0,-1.0,-1.0,
+             1.0, 1.0, 1.0, 1.0,
+        ]), Some((0.0, 0.5, 0.0)) );
+        assert_eq!( edge_intersection(0x3ff, 9, &p, &[
+            -1.0,-1.0,-1.0,-1.0,
+            1.0, 1.0, 1.0, 1.0,
+        ]), Some((1.0, 0.5, 0.0)) );
+        assert_eq!( edge_intersection(0xfff, 10, &p, &[
+            -1.0,-1.0,-1.0,-1.0,
+            1.0, 1.0, 1.0, 1.0,
+        ]), Some((1.0, 0.5, 1.0)) );
+        assert_eq!( edge_intersection(0xfff, 11, &p, &[
+            -1.0,-1.0,-1.0,-1.0,
+            1.0, 1.0, 1.0, 1.0,
+        ]), Some((0.0, 0.5, 1.0)) );
+
     }
 
 }
