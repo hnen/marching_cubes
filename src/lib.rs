@@ -7,6 +7,9 @@ pub struct Vec3(f32, f32, f32);
 pub struct Bounds((f32, f32, f32), (f32, f32, f32));
 
 impl Mesh {
+    pub fn new(verts : Vec<Vec3>, inds : Vec<usize>) -> Mesh {
+        unimplemented!();
+    }
     pub fn empty() -> Mesh { unimplemented!(); }
 }
 
@@ -61,7 +64,7 @@ fn tessellate_corners(p : &[Vec3], f : &[f32]) -> Mesh {
     if edges == 0 {
         Mesh::empty()
     } else {
-        (0..12).map(|i| {
+        let mut i = (0..12).map(|i| {
             if (edges >> i) & 1 == 0 {
                 None
             } else {
@@ -75,7 +78,30 @@ fn tessellate_corners(p : &[Vec3], f : &[f32]) -> Mesh {
                 ) )
             }
         } );
-        unimplemented!();
+        let vmap = [
+            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
+            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
+            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
+            i.next().unwrap(), i.next().unwrap(), i.next().unwrap(),
+        ];
+
+        let mut inds = Vec::with_capacity(15);
+        let mut verts = Vec::with_capacity(15);
+
+        for t in TRI_TABLE[edges].iter() {
+            let t = t.unwrap();
+            inds.push(verts.len()+0);
+            inds.push(verts.len()+1);
+            inds.push(verts.len()+2);
+            let v0 = vmap[t.0].unwrap();
+            let v1 = vmap[t.1].unwrap();
+            let v2 = vmap[t.2].unwrap();
+            verts.push(Vec3(v0.0,v0.1,v0.2));
+            verts.push(Vec3(v1.0,v1.1,v1.2));
+            verts.push(Vec3(v2.0,v2.1,v2.2));
+        }
+
+        Mesh::new(verts, inds)
     }
 }
 
@@ -95,13 +121,13 @@ mod tests {
 
 }
 
-const EDGES : [(u8,u8);12] = [
+const EDGES : [(usize,usize);12] = [
     (0,1), (1,2), (2,3), (3,0),
     (4,5), (5,6), (6,7), (7,4),
     (0,4), (1,5), (2,6), (3,7)
 ];
 
-const EDGE_TABLE: [u16; 256] = [
+const EDGE_TABLE: [usize; 256] = [
     0x0,
     0x109,
     0x203,
@@ -360,7 +386,7 @@ const EDGE_TABLE: [u16; 256] = [
     0x0,
 ];
 
-const TRI_TABLE: [[Option<(i8, i8, i8)>; 5]; 256] = [
+const TRI_TABLE: [[Option<(usize, usize, usize)>; 5]; 256] = [
     [None, None, None, None, None, ],
     [Some((0, 8, 3)), None, None, None, None, ],
     [Some((0, 1, 9)), None, None, None, None, ],
