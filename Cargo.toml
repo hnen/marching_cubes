@@ -1,0 +1,6 @@
+[package]
+name = "marching-cubes"
+version = "0.1.0"
+authors = ["hnen <hhatinen@gmail.com>"]
+
+[dependencies]
