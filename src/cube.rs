@@ -122,6 +122,8 @@ mod tests {
         let m = tessellate_corners(&p, &[-1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0]);
         assert_eq!(2, m.1.len()); // tessellates with quad, so 2 triangles
 
+        let mut area = None;
+
         // Check that normals face towards +X
         for t in m.1 {
             let v0 = &m.0[t.0];
@@ -134,8 +136,17 @@ mod tests {
                 -(e0.0 * e1.2 - e1.0 * e0.2),
                 e0.0 * e1.1 - e0.1 * e1.0,
             );
+            assert!(n.0 > 0.0);
             assert_eq!(n.1, 0.0);
             assert_eq!(n.2, 0.0);
+            if let Some(area) = area {
+                // while we're at it, make sure triangles have the same area. this happens to be
+                // length of the cross product (divided by 2 but we're doing eq comparison so
+                // doesn't matter)
+                assert_eq!(n.0, area);
+            } else {
+                area = Some(n.0);
+            }
         }
 
         // Tessellate with one corner inside volume
