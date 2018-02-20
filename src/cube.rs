@@ -59,15 +59,18 @@ pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
         let mut tris = Vec::with_capacity(5);
         let mut verts = Vec::with_capacity(15);
 
-        for t in EDGE_ISECTS_TO_TRIS[edges].iter() {
-            let t = t.unwrap();
-            tris.push(Triangle(verts.len(), verts.len() + 1, verts.len() + 2));
-            let v0 = vmap[t.0].unwrap();
-            let v1 = vmap[t.1].unwrap();
-            let v2 = vmap[t.2].unwrap();
-            verts.push(Vertex(v0.0, v0.1, v0.2));
-            verts.push(Vertex(v1.0, v1.1, v1.2));
-            verts.push(Vertex(v2.0, v2.1, v2.2));
+        let tri_inds = EDGE_ISECTS_TO_TRIS[corners_in];
+
+        for t in tri_inds.iter() {
+            if let &Some(t) = t {
+                tris.push(Triangle(verts.len(), verts.len() + 1, verts.len() + 2));
+                let v0 = vmap[t.0].unwrap();
+                let v1 = vmap[t.1].unwrap();
+                let v2 = vmap[t.2].unwrap();
+                verts.push(Vertex(v0.0, v0.1, v0.2));
+                verts.push(Vertex(v1.0, v1.1, v1.2));
+                verts.push(Vertex(v2.0, v2.1, v2.2));
+            }
         }
 
         Mesh::new(verts, tris)
@@ -114,6 +117,44 @@ mod tests {
             (0.0, 1.0, 1.0),
         ];
 
+        // Tessellate with isect at YZ plane in middle of the cube
+        let m = tessellate_corners(&p, &[
+            -1.0, 1.0, 1.0, -1.0,
+            -1.0, 1.0, 1.0, -1.0,
+        ]);
+        assert_eq!(2, m.1.len()); // tessellates with quad, so 2 triangles
+
+        // Check that normals face towards +X
+        for t in m.1 {
+            let v0 = &m.0[t.0];
+            let v1 = &m.0[t.1];
+            let v2 = &m.0[t.2];
+            let e0 = (v1.0-v0.0, v1.1-v0.1, v1.2-v0.2);
+            let e1 = (v2.0-v0.0, v2.1-v0.1, v2.2-v0.2);
+            let n = (e0.1*e1.2-e0.2*e1.1, -(e0.0*e1.2-e1.0*e0.2), e0.0*e1.1-e0.1*e1.0);
+            assert_eq!( n.1, 0.0 );
+            assert_eq!( n.2, 0.0 );
+        }
+
+        // Tessellate with one corner inside volume
+        let m = tessellate_corners(&p, &[
+            -1.0, 1.0, 1.0, 1.0,
+             1.0, 1.0, 1.0, 1.0,
+        ]);
+        assert_eq!(1, m.1.len());
+
+        // Normal should be facing (1,1,1)
+        for t in m.1 {
+            let v0 = &m.0[t.0];
+            let v1 = &m.0[t.1];
+            let v2 = &m.0[t.2];
+            let e0 = (v1.0-v0.0, v1.1-v0.1, v1.2-v0.2);
+            let e1 = (v2.0-v0.0, v2.1-v0.1, v2.2-v0.2);
+            let n = (e0.1*e1.2-e0.2*e1.1, -(e0.0*e1.2-e1.0*e0.2), e0.0*e1.1-e0.1*e1.0);
+            assert_eq!( n.0, n.1 );
+            assert_eq!( n.0, n.2 );
+            assert!(n.0 > 0.0)
+        }
 
     }
 
