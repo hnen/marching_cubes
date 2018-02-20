@@ -12,6 +12,3 @@ impl Mesh {
         Mesh(Vec::new(), Vec::new())
     }
 }
-
-
-

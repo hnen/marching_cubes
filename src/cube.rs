@@ -8,7 +8,7 @@ use tables::VERTS_INSIDE_TO_EDGE_ISECT;
 use tables::EDGE_ISECTS_TO_TRIS;
 use tables::EDGES;
 
-pub fn tessellate_cube(min: &(f32,f32,f32), max: &(f32,f32,f32), field: &GeomField) -> Mesh {
+pub fn tessellate_cube(min: &(f32, f32, f32), max: &(f32, f32, f32), field: &GeomField) -> Mesh {
     let p = [
         (min.0, min.1, min.2),
         (max.0, min.1, min.2),
@@ -32,7 +32,7 @@ pub fn tessellate_cube(min: &(f32,f32,f32), max: &(f32,f32,f32), field: &GeomFie
     tessellate_corners(&p, &f)
 }
 
-pub fn tessellate_corners(p: &[(f32,f32,f32)], f: &[f32]) -> Mesh {
+pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
     let corners_in = (0..8).filter(|i| f[*i as usize] < 0.0).fold(
         0,
         |c, i| c | (1 << i),
@@ -61,7 +61,7 @@ pub fn tessellate_corners(p: &[(f32,f32,f32)], f: &[f32]) -> Mesh {
 
         for t in EDGE_ISECTS_TO_TRIS[edges].iter() {
             let t = t.unwrap();
-            tris.push( Triangle(verts.len(), verts.len()+1, verts.len()+2) );
+            tris.push(Triangle(verts.len(), verts.len() + 1, verts.len() + 2));
             let v0 = vmap[t.0].unwrap();
             let v1 = vmap[t.1].unwrap();
             let v2 = vmap[t.2].unwrap();
@@ -75,7 +75,12 @@ pub fn tessellate_corners(p: &[(f32,f32,f32)], f: &[f32]) -> Mesh {
 }
 
 #[inline]
-fn edge_intersection(edges: usize, i: usize, p: &[(f32,f32,f32)], f: &[f32]) -> Option<(f32, f32, f32)> {
+fn edge_intersection(
+    edges: usize,
+    i: usize,
+    p: &[(f32, f32, f32)],
+    f: &[f32],
+) -> Option<(f32, f32, f32)> {
     if (edges >> i) & 1 == 0 {
         None
     } else {
@@ -184,6 +189,3 @@ mod tests {
 
 
 }
-
-
-

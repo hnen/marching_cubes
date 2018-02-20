@@ -22,7 +22,12 @@ impl GeomField for SphereField {
     }
 }
 
-pub fn create_mesh(field: &GeomField, min_bound: &(f32,f32,f32), max_bound: &(f32,f32,f32), grid_size: &(f32,f32,f32)) -> Mesh {
+pub fn create_mesh(
+    field: &GeomField,
+    min_bound: &(f32, f32, f32),
+    max_bound: &(f32, f32, f32),
+    grid_size: &(f32, f32, f32),
+) -> Mesh {
     unimplemented!();
 }
 
@@ -35,11 +40,11 @@ mod tests {
     #[should_panic]
     fn it_works() {
         let sfield = SphereField::new(10.0);
-        let _mesh = create_mesh(
-            &sfield,
-            &(-10.0, -10.0, -10.0), &(10.0, 10.0, 10.0),
-            &(1.0, 1.0, 1.0),
-        );
+        let _mesh = create_mesh(&sfield, &(-10.0, -10.0, -10.0), &(10.0, 10.0, 10.0), &(
+            1.0,
+            1.0,
+            1.0,
+        ));
     }
 
 
