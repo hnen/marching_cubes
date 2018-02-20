@@ -105,6 +105,7 @@ mod tests {
 
     #[test]
     fn test_corners() {
+        // an unit cube (0,0,0)-(1,1,1)
         let p = [
             (0.0, 0.0, 0.0),
             (1.0, 0.0, 0.0),
@@ -118,10 +119,7 @@ mod tests {
         ];
 
         // Tessellate with isect at YZ plane in middle of the cube
-        let m = tessellate_corners(&p, &[
-            -1.0, 1.0, 1.0, -1.0,
-            -1.0, 1.0, 1.0, -1.0,
-        ]);
+        let m = tessellate_corners(&p, &[-1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0]);
         assert_eq!(2, m.1.len()); // tessellates with quad, so 2 triangles
 
         // Check that normals face towards +X
@@ -129,30 +127,35 @@ mod tests {
             let v0 = &m.0[t.0];
             let v1 = &m.0[t.1];
             let v2 = &m.0[t.2];
-            let e0 = (v1.0-v0.0, v1.1-v0.1, v1.2-v0.2);
-            let e1 = (v2.0-v0.0, v2.1-v0.1, v2.2-v0.2);
-            let n = (e0.1*e1.2-e0.2*e1.1, -(e0.0*e1.2-e1.0*e0.2), e0.0*e1.1-e0.1*e1.0);
-            assert_eq!( n.1, 0.0 );
-            assert_eq!( n.2, 0.0 );
+            let e0 = (v1.0 - v0.0, v1.1 - v0.1, v1.2 - v0.2);
+            let e1 = (v2.0 - v0.0, v2.1 - v0.1, v2.2 - v0.2);
+            let n = (
+                e0.1 * e1.2 - e0.2 * e1.1,
+                -(e0.0 * e1.2 - e1.0 * e0.2),
+                e0.0 * e1.1 - e0.1 * e1.0,
+            );
+            assert_eq!(n.1, 0.0);
+            assert_eq!(n.2, 0.0);
         }
 
         // Tessellate with one corner inside volume
-        let m = tessellate_corners(&p, &[
-            -1.0, 1.0, 1.0, 1.0,
-             1.0, 1.0, 1.0, 1.0,
-        ]);
-        assert_eq!(1, m.1.len());
+        let m = tessellate_corners(&p, &[-1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]);
+        assert_eq!(1, m.1.len()); // Intersects 3 edges, so 1 triangle
 
         // Normal should be facing (1,1,1)
         for t in m.1 {
             let v0 = &m.0[t.0];
             let v1 = &m.0[t.1];
             let v2 = &m.0[t.2];
-            let e0 = (v1.0-v0.0, v1.1-v0.1, v1.2-v0.2);
-            let e1 = (v2.0-v0.0, v2.1-v0.1, v2.2-v0.2);
-            let n = (e0.1*e1.2-e0.2*e1.1, -(e0.0*e1.2-e1.0*e0.2), e0.0*e1.1-e0.1*e1.0);
-            assert_eq!( n.0, n.1 );
-            assert_eq!( n.0, n.2 );
+            let e0 = (v1.0 - v0.0, v1.1 - v0.1, v1.2 - v0.2);
+            let e1 = (v2.0 - v0.0, v2.1 - v0.1, v2.2 - v0.2);
+            let n = (
+                e0.1 * e1.2 - e0.2 * e1.1,
+                -(e0.0 * e1.2 - e1.0 * e0.2),
+                e0.0 * e1.1 - e0.1 * e1.0,
+            );
+            assert_eq!(n.0, n.1);
+            assert_eq!(n.0, n.2);
             assert!(n.0 > 0.0)
         }
 
@@ -160,6 +163,7 @@ mod tests {
 
     #[test]
     fn test_edge_isect() {
+        // an unit cube (0,0,0)-(1,1,1)
         let p = [
             (0.0, 0.0, 0.0),
             (1.0, 0.0, 0.0),
@@ -172,7 +176,8 @@ mod tests {
             (0.0, 1.0, 1.0),
         ];
 
-        // Intersection is on YZ plane in middle of the unit cube
+        // Intersection is on YZ plane in middle of the unit cube.
+        // Test that intersection is found in the middle of the edge (and correct edge is returned.)
         assert_eq!(
             edge_intersection(1, 0, &p, &[-1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0]),
             Some((0.5, 0.0, 0.0))
