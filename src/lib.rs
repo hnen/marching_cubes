@@ -60,9 +60,9 @@ fn create_mesh_precomputed(
     max_bound: &(f32, f32, f32),
 ) -> Mesh {
     let cube_size = (
-        (max_bound.0 - min_bound.0) / (field.corner_count().0 as f32),
-        (max_bound.1 - min_bound.1) / (field.corner_count().1 as f32),
-        (max_bound.2 - min_bound.2) / (field.corner_count().2 as f32),
+        (max_bound.0 - min_bound.0) / (field.cube_count().0 as f32),
+        (max_bound.1 - min_bound.1) / (field.cube_count().1 as f32),
+        (max_bound.2 - min_bound.2) / (field.cube_count().2 as f32),
     );
     let mut verts = Vec::new();
     let mut tris = Vec::new();
@@ -157,12 +157,54 @@ mod tests {
     fn test_precomputed() {
         let field = field_precomputed();
         let mesh = create_mesh_precomputed(&field, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0));
+        // The result should be with the test field a regular octahedron with
+        // bounds at +-(0.5,0.5,0.5)
         assert_eq!(8, mesh.1.len());
         assert_eq!(
             Some(&Vertex(-0.5, 0.0, 0.0)),
             mesh.0.iter().min_by(
                 |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
                     x0.partial_cmp(&x1).unwrap()
+                },
+            )
+        );
+        assert_eq!(
+            Some(&Vertex( 0.5, 0.0, 0.0)),
+            mesh.0.iter().max_by(
+                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                    x0.partial_cmp(&x1).unwrap()
+                },
+            )
+        );
+        assert_eq!(
+            Some(&Vertex( 0.0,-0.5, 0.0)),
+            mesh.0.iter().min_by(
+                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                    y0.partial_cmp(&y1).unwrap()
+                },
+            )
+        );
+        assert_eq!(
+            Some(&Vertex( 0.0, 0.5, 0.0)),
+            mesh.0.iter().max_by(
+                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                    y0.partial_cmp(&y1).unwrap()
+                },
+            )
+        );
+        assert_eq!(
+            Some(&Vertex( 0.0, 0.0,-0.5)),
+            mesh.0.iter().min_by(
+                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                    z0.partial_cmp(&z1).unwrap()
+                },
+            )
+        );
+        assert_eq!(
+            Some(&Vertex( 0.0, 0.0, 0.5)),
+            mesh.0.iter().max_by(
+                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                    z0.partial_cmp(&z1).unwrap()
                 },
             )
         );
