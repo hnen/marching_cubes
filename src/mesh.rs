@@ -1,6 +1,6 @@
 
-pub struct Vertex(pub f32, pub f32, pub f32);
-pub struct Triangle(pub usize, pub usize, pub usize);
+#[derive(Clone, PartialEq, Debug)] pub struct Vertex(pub f32, pub f32, pub f32);
+#[derive(Clone, PartialEq, Debug)] pub struct Triangle(pub usize, pub usize, pub usize);
 
 pub struct Mesh(pub Vec<Vertex>, pub Vec<Triangle>);
 
