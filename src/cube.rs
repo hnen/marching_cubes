@@ -56,8 +56,6 @@ pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
             edge_intersection_unwrap(edges, 11, p, f),
         ];
 
-        //let mut tris = Vec::with_capacity(5);
-
         let tri_inds = EDGE_ISECTS_TO_TRIS[corners_in];
 
         let tris: Vec<_> = tri_inds
@@ -81,8 +79,6 @@ fn edge_intersection_unwrap(edges: usize, i: usize, p: &[(f32, f32, f32)], f: &[
         Vertex(0.0, 0.0, 0.0)
     }
 }
-
-
 
 #[inline]
 fn edge_intersection(
