@@ -63,9 +63,9 @@ fn precompute_field(
             let mut row = Vec::with_capacity(corner_counts.2);
             for x in 0..corner_counts.2 {
                 let fx = (
-                    (x as f32) * (max_bound.0 - min_bound.0) / (cube_count.0 as f32),
-                    (y as f32) * (max_bound.1 - min_bound.1) / (cube_count.1 as f32),
-                    (z as f32) * (max_bound.2 - min_bound.2) / (cube_count.2 as f32),
+                    min_bound.0 + (x as f32) * (max_bound.0 - min_bound.0) / (cube_count.0 as f32),
+                    min_bound.1 + (y as f32) * (max_bound.1 - min_bound.1) / (cube_count.1 as f32),
+                    min_bound.2 + (z as f32) * (max_bound.2 - min_bound.2) / (cube_count.2 as f32),
                 );
                 row.push(field.f(fx.0, fx.1, fx.2));
             }
