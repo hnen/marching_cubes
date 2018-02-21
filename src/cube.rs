@@ -60,30 +60,23 @@ pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
 
         let tri_inds = EDGE_ISECTS_TO_TRIS[corners_in];
 
-        let tris : Vec<_> = tri_inds
+        let tris: Vec<_> = tri_inds
             .iter()
-            .filter_map(
-                |t|
-                if let &Some(t) = t {
-                    Some(Triangle(t.0,t.1,t.2))
-                } else {
-                    None
-                }
-            ).collect();
+            .filter_map(|t| if let &Some(t) = t {
+                Some(Triangle(t.0, t.1, t.2))
+            } else {
+                None
+            })
+            .collect();
 
         Mesh::new(vmap, tris)
     }
 }
 
 #[inline]
-fn edge_intersection_unwrap(
-    edges: usize,
-    i: usize,
-    p: &[(f32, f32, f32)],
-    f: &[f32],
-) -> Vertex {
-    if let Some((x,y,z)) = edge_intersection(edges, i, p, f) {
-        Vertex(x,y,z)
+fn edge_intersection_unwrap(edges: usize, i: usize, p: &[(f32, f32, f32)], f: &[f32]) -> Vertex {
+    if let Some((x, y, z)) = edge_intersection(edges, i, p, f) {
+        Vertex(x, y, z)
     } else {
         Vertex(0.0, 0.0, 0.0)
     }
