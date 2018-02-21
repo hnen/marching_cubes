@@ -39,9 +39,11 @@ pub fn create_mesh(
 
 }
 
-fn create_mesh_precomputed(field : &FieldPrecomputed,
-   min_bound: &(f32, f32, f32),
-   max_bound: &(f32, f32, f32)) -> Mesh {
+fn create_mesh_precomputed(
+    field: &FieldPrecomputed,
+    min_bound: &(f32, f32, f32),
+    max_bound: &(f32, f32, f32),
+) -> Mesh {
     unimplemented!();
 }
 
@@ -51,23 +53,20 @@ fn precompute_field(
     max_bound: &(f32, f32, f32),
     cube_count: &(usize, usize, usize),
 ) -> FieldPrecomputed {
-    let corner_counts = (
-        cube_count.0 + 1,
-        cube_count.1 + 1,
-        cube_count.2 + 1,
-    );
+    let corner_counts = (cube_count.0 + 1, cube_count.1 + 1, cube_count.2 + 1);
     let mut field_table = Vec::with_capacity(corner_counts.0);
     for z in 0..corner_counts.2 {
         let mut slice = Vec::with_capacity(corner_counts.1);
         for y in 0..corner_counts.1 {
             let mut row = Vec::with_capacity(corner_counts.2);
-            for x in 0..corner_counts.2 {
-                let fx = (
-                    min_bound.0 + (x as f32) * (max_bound.0 - min_bound.0) / (cube_count.0 as f32),
-                    min_bound.1 + (y as f32) * (max_bound.1 - min_bound.1) / (cube_count.1 as f32),
-                    min_bound.2 + (z as f32) * (max_bound.2 - min_bound.2) / (cube_count.2 as f32),
+            for x in 0..corner_counts.0 {
+                let (fx, fy, fz) = (x as f32, y as f32, z as f32);
+                let fp = (
+                    min_bound.0 + fx * (max_bound.0 - min_bound.0) / (cube_count.0 as f32),
+                    min_bound.1 + fy * (max_bound.1 - min_bound.1) / (cube_count.1 as f32),
+                    min_bound.2 + fz * (max_bound.2 - min_bound.2) / (cube_count.2 as f32),
                 );
-                row.push(field.f(fx.0, fx.1, fx.2));
+                row.push(field.f(fp.0, fp.1, fp.2));
             }
             slice.push(row)
         }
@@ -85,7 +84,11 @@ mod tests {
     #[should_panic]
     fn it_works() {
         let sfield = SphereField::new(10.0);
-        let _mesh = create_mesh(&sfield, &(-10.0, -10.0, -10.0), &(10.0, 10.0, 10.0), &(20,20,20));
+        let _mesh = create_mesh(&sfield, &(-10.0, -10.0, -10.0), &(10.0, 10.0, 10.0), &(
+            20,
+            20,
+            20,
+        ));
     }
 
 
