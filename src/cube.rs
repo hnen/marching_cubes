@@ -41,41 +41,55 @@ pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
     if edges == 0 {
         Mesh::empty()
     } else {
-        let vmap = [
-            edge_intersection(edges, 0, p, f),
-            edge_intersection(edges, 1, p, f),
-            edge_intersection(edges, 2, p, f),
-            edge_intersection(edges, 3, p, f),
-            edge_intersection(edges, 4, p, f),
-            edge_intersection(edges, 5, p, f),
-            edge_intersection(edges, 6, p, f),
-            edge_intersection(edges, 7, p, f),
-            edge_intersection(edges, 8, p, f),
-            edge_intersection(edges, 9, p, f),
-            edge_intersection(edges, 10, p, f),
-            edge_intersection(edges, 11, p, f),
+        let vmap = vec![
+            edge_intersection_unwrap(edges, 0, p, f),
+            edge_intersection_unwrap(edges, 1, p, f),
+            edge_intersection_unwrap(edges, 2, p, f),
+            edge_intersection_unwrap(edges, 3, p, f),
+            edge_intersection_unwrap(edges, 4, p, f),
+            edge_intersection_unwrap(edges, 5, p, f),
+            edge_intersection_unwrap(edges, 6, p, f),
+            edge_intersection_unwrap(edges, 7, p, f),
+            edge_intersection_unwrap(edges, 8, p, f),
+            edge_intersection_unwrap(edges, 9, p, f),
+            edge_intersection_unwrap(edges, 10, p, f),
+            edge_intersection_unwrap(edges, 11, p, f),
         ];
 
-        let mut tris = Vec::with_capacity(5);
-        let mut verts = Vec::with_capacity(15);
+        //let mut tris = Vec::with_capacity(5);
 
         let tri_inds = EDGE_ISECTS_TO_TRIS[corners_in];
 
-        for t in tri_inds.iter() {
-            if let &Some(t) = t {
-                tris.push(Triangle(verts.len(), verts.len() + 1, verts.len() + 2));
-                let v0 = vmap[t.0].unwrap();
-                let v1 = vmap[t.1].unwrap();
-                let v2 = vmap[t.2].unwrap();
-                verts.push(Vertex(v0.0, v0.1, v0.2));
-                verts.push(Vertex(v1.0, v1.1, v1.2));
-                verts.push(Vertex(v2.0, v2.1, v2.2));
-            }
-        }
+        let tris : Vec<_> = tri_inds
+            .iter()
+            .filter_map(
+                |t|
+                if let &Some(t) = t {
+                    Some(Triangle(t.0,t.1,t.2))
+                } else {
+                    None
+                }
+            ).collect();
 
-        Mesh::new(verts, tris)
+        Mesh::new(vmap, tris)
     }
 }
+
+#[inline]
+fn edge_intersection_unwrap(
+    edges: usize,
+    i: usize,
+    p: &[(f32, f32, f32)],
+    f: &[f32],
+) -> Vertex {
+    if let Some((x,y,z)) = edge_intersection(edges, i, p, f) {
+        Vertex(x,y,z)
+    } else {
+        Vertex(0.0, 0.0, 0.0)
+    }
+}
+
+
 
 #[inline]
 fn edge_intersection(
