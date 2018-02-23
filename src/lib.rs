@@ -8,6 +8,7 @@ mod field;
 mod mesh;
 
 use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use field::GeomField;
 use mesh::Mesh;
@@ -70,7 +71,7 @@ fn create_mesh_precomputed(
     let mut verts = Vec::new();
     let mut tris = Vec::new();
 
-    let mut edge_to_vert_map = HashMap::new();
+    let mut edge_to_vert_map = BTreeMap::new();
 
     for z in 0..field.cube_count().2 {
         for y in 0..field.cube_count().1 {
@@ -200,6 +201,42 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_edge_index() {
+        assert_eq!( grid_shared_edge_index(0,0,1,0), grid_shared_edge_index(0,0,0,2) );
+        assert_eq!( grid_shared_edge_index(0,1,1,0), grid_shared_edge_index(0,0,0,6) );
+        assert_eq!( grid_shared_edge_index(0,1,0,0), grid_shared_edge_index(0,0,0,4) );
+
+        assert_eq!( grid_shared_edge_index(0,0,0,1), grid_shared_edge_index(1,0,0,3) );
+        assert_eq!( grid_shared_edge_index(0,1,0,1), grid_shared_edge_index(1,0,0,7) );
+        assert_eq!( grid_shared_edge_index(0,1,0,1), grid_shared_edge_index(0,0,0,5) );
+
+        assert_eq!( grid_shared_edge_index(0,0,0,2), grid_shared_edge_index(0,0,1,0) );
+        assert_eq!( grid_shared_edge_index(0,1,0,2), grid_shared_edge_index(0,0,1,4) );
+        assert_eq!( grid_shared_edge_index(0,1,0,2), grid_shared_edge_index(0,0,0,6) );
+
+        assert_eq!( grid_shared_edge_index(1,0,0,3), grid_shared_edge_index(0,0,0,1) );
+        assert_eq!( grid_shared_edge_index(1,1,0,3), grid_shared_edge_index(0,0,0,5) );
+        assert_eq!( grid_shared_edge_index(0,1,0,3), grid_shared_edge_index(0,0,0,7) );
+
+        assert_eq!( grid_shared_edge_index(1,0,0,8), grid_shared_edge_index(0,0,0,9) );
+        assert_eq!( grid_shared_edge_index(0,0,1,8), grid_shared_edge_index(0,0,0,11) );
+        assert_eq!( grid_shared_edge_index(1,0,1,8), grid_shared_edge_index(0,0,0,10) );
+
+        assert_eq!( grid_shared_edge_index(0,0,1,9), grid_shared_edge_index(0,0,0,10) );
+        assert_eq!( grid_shared_edge_index(0,0,0,9), grid_shared_edge_index(1,0,0,8) );
+        assert_eq!( grid_shared_edge_index(0,0,1,9), grid_shared_edge_index(1,0,0,11) );
+
+        assert_eq!( grid_shared_edge_index(0,0,0,10), grid_shared_edge_index(1,0,0,11) );
+        assert_eq!( grid_shared_edge_index(0,0,0,10), grid_shared_edge_index(0,0,1,9) );
+        assert_eq!( grid_shared_edge_index(0,0,0,10), grid_shared_edge_index(1,0,1,8) );
+
+        assert_eq!( grid_shared_edge_index(0,0,0,11), grid_shared_edge_index(0,0,1,8) );
+        assert_eq!( grid_shared_edge_index(1,0,0,11), grid_shared_edge_index(0,0,0,10) );
+        assert_eq!( grid_shared_edge_index(1,0,0,11), grid_shared_edge_index(0,0,1,9) );
+
+    }
+
+    #[test]
     fn test_sphere() {
         let sfield = SphereField::new(1.0);
         let mesh = create_mesh(
@@ -252,6 +289,9 @@ mod tests {
             let nd = (n.0 * n.0 + n.1 * n.1 + n.2 * n.2).sqrt();
             let n = (n.0 / nd, n.1 / nd, n.2 / nd);
             let d = (n.0 * rv.0 + n.1 * rv.1 + n.2 * rv.2);
+            if nd/2.0 > (2.0/50.0)*(2.0/50.0) {
+                println!("AREA: {}", nd);
+            }
             if d < 0.0 {
                 println!("{}", d);
                 fail = true;
