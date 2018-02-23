@@ -238,14 +238,14 @@ mod tests {
 
     #[test]
     fn test_sphere() {
-        let sfield = SphereField::new(1.0);
+        let sfield = SphereField::new(0.98);
         let mesh = create_mesh(
             &sfield,
             &(-1.0, -1.0, -1.0),
             &(1.0, 1.0, 1.0),
             &(50, 50, 50),
         );
-        assert_is_sphere(&mesh, 1.0);
+        assert_is_sphere(&mesh, 0.98);
     }
 
     #[test]
@@ -287,7 +287,7 @@ mod tests {
                 (v0.2 + v1.2 + v2.2) / 3.0,
             );
             let nd = (n.0 * n.0 + n.1 * n.1 + n.2 * n.2).sqrt();
-            let n = (n.0 / nd, n.1 / nd, n.2 / nd);
+            //let n = (n.0 / nd, n.1 / nd, n.2 / nd);
             let d = (n.0 * rv.0 + n.1 * rv.1 + n.2 * rv.2);
             if nd/2.0 > (2.0/50.0)*(2.0/50.0) {
                 println!("AREA: {}", nd);
