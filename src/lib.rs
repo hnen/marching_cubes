@@ -26,7 +26,7 @@ impl SphereField {
 impl GeomField for SphereField {
     fn f(&self, x: f32, y: f32, z: f32) -> f32 {
         let &SphereField(r) = self;
-        x * x + y * y + z * z - r * r
+        (x * x + y * y + z * z).sqrt() - r
     }
 }
 
@@ -196,7 +196,7 @@ mod tests {
     #[test]
     fn test_sphere() {
         let sfield = SphereField::new(1.0);
-        let mesh = create_mesh(&sfield, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0), &(20, 20, 20));
+        let mesh = create_mesh(&sfield, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0), &(50, 50, 50));
         assert_is_sphere(&mesh, 1.0);
     }
 
@@ -215,7 +215,40 @@ mod tests {
     }
 
     fn assert_is_sphere(mesh : &Mesh, r : f32) {
+        // All vertices are within radius r
+        for vert in &mesh.0 {
+            assert!((vert.0 * vert.0 + vert.1 * vert.1 + vert.2 * vert.2 - r * r).abs() < 0.001);
+        }
 
+        // All triangle normals point towards radius vec
+        let mut fail = false;
+        for tri in &mesh.1 {
+            let v0 = &mesh.0[tri.0];
+            let v1 = &mesh.0[tri.1];
+            let v2 = &mesh.0[tri.2];
+            let e0 = (v1.0 - v0.0, v1.1 - v0.1, v1.2 - v0.2);
+            let e1 = (v2.0 - v0.0, v2.1 - v0.1, v2.2 - v0.2);
+            let n = (
+                e0.1 * e1.2 - e0.2 * e1.1,
+                -(e0.0 * e1.2 - e1.0 * e0.2),
+                e0.0 * e1.1 - e0.1 * e1.0,
+            );
+            let rv = (
+                (v0.0 + v1.0 + v2.0) / 3.0,
+                (v0.1 + v1.1 + v2.1) / 3.0,
+                (v0.2 + v1.2 + v2.2) / 3.0,
+            );
+            let nd = (n.0*n.0 + n.1*n.1 + n.2*n.2).sqrt();
+            let n = (n.0 / nd, n.1 / nd, n.2 / nd);
+            let d = (n.0 * rv.0 + n.1 * rv.1 + n.2 * rv.2);
+            if d < 0.0 {
+                println!("{}", d);
+                fail = true;
+            }
+        }
+        if fail {
+            panic!("There was some triangles facing the wrong way.");
+        }
     }
 
     fn assert_is_octahedron(mesh : &Mesh, r : f32) {
