@@ -60,7 +60,7 @@ pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
 
         let tris: Vec<_> = tri_inds
             .iter()
-            .filter_map(|t| if let &Some(t) = t {
+            .filter_map(|t| if let Some(t) = *t {
                 Some(Triangle(t.0, t.1, t.2))
             } else {
                 None
@@ -91,10 +91,10 @@ fn edge_intersection(
         None
     } else {
         let (v0, v1) = EDGES[i];
-        let (ref p0, ref p1) = (&p[v0], &p[v1]);
+        let (p0, p1) = (&p[v0], &p[v1]);
         let (f0, f1) = (f[v0], f[v1]);
         if (f0 - f1).abs() < 0.000001 {
-            Some(*p0.clone())
+            Some(*p0)
         } else {
             Some((
                 p0.0 - f0 * (p1.0 - p0.0) / (f1 - f0),
