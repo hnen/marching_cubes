@@ -93,7 +93,7 @@ fn edge_intersection(
         let (v0, v1) = EDGES[i];
         let (ref p0, ref p1) = (&p[v0], &p[v1]);
         let (f0, f1) = (f[v0], f[v1]);
-        if (f0-f1).abs() < 0.000001 {
+        if (f0 - f1).abs() < 0.000001 {
             Some(*p0.clone())
         } else {
             Some((
