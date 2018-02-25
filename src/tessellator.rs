@@ -1,5 +1,4 @@
 
-use field::GeomField;
 use mesh::Mesh;
 use mesh::Triangle;
 
@@ -7,18 +6,7 @@ use std::collections::HashMap;
 use cube::tessellate_corners;
 use field::Field;
 
-
-pub fn create_mesh_from_field(
-    field: &GeomField,
-    min_bound: &(f32, f32, f32),
-    max_bound: &(f32, f32, f32),
-    cube_count: &(usize, usize, usize),
-) -> Mesh {
-    let field_table = Field::from_geomfield(field, min_bound, max_bound, cube_count);
-    create_mesh_precomputed(&field_table, min_bound, max_bound)
-}
-
-pub fn create_mesh_precomputed(
+pub fn create_mesh(
     field: &Field,
     min_bound: &(f32, f32, f32),
     max_bound: &(f32, f32, f32),
@@ -131,6 +119,7 @@ fn grid_shared_edge_index(
 mod tests {
     use super::*;
 
+    use field::GeomField;
     use mesh::Vertex;
 
     struct SphereField(f32);
@@ -257,27 +246,36 @@ mod tests {
     #[test]
     fn test_sphere() {
         let sfield = SphereField::new(0.98);
-        let mesh = create_mesh_from_field(
-            &sfield,
+
+        let field_table = Field::from_geomfield(&sfield,
             &(-1.0, -1.0, -1.0),
             &(1.0, 1.0, 1.0),
-            &(50, 50, 50),
+            &(50, 50, 50)
         );
+        let mesh = create_mesh(&field_table,
+                               &(-1.0, -1.0, -1.0),
+                               &(1.0, 1.0, 1.0)
+        );
+
         assert_is_sphere(&mesh, 0.98);
     }
 
     #[test]
     fn test_field() {
         let sfield = SphereField::new(1.0);
-        let mesh =
-            create_mesh_from_field(&sfield, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0), &(2, 2, 2));
+        let field_table = Field::from_geomfield(&sfield,
+            &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0), &(2, 2, 2)
+        );
+        let mesh = create_mesh(&field_table,
+                               &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0)
+        );
         assert_is_octahedron(&mesh, 1.0);
     }
 
     #[test]
     fn test_precomputed() {
         let field = field_precomputed();
-        let mesh = create_mesh_precomputed(&field, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0));
+        let mesh = create_mesh(&field, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0));
         assert_is_octahedron(&mesh, 0.5);
     }
 
