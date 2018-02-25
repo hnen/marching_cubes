@@ -9,7 +9,7 @@ mod mesh;
 mod tessellator;
 
 pub use field::GeomField;
-pub use tessellator::FieldPrecomputed;
+pub use tessellator::Field;
 
 pub use tessellator::create_mesh_from_field;
 pub use tessellator::create_mesh_precomputed;

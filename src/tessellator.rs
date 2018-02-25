@@ -7,8 +7,9 @@ use std::collections::HashMap;
 
 use cube::tessellate_corners;
 
-pub struct FieldPrecomputed(Vec<Vec<Vec<f32>>>);
-impl FieldPrecomputed {
+pub struct Field(pub Vec<Vec<Vec<f32>>>);
+
+impl Field {
     pub fn cube_count(&self) -> (usize, usize, usize) {
         (
             self.0[0][0].len() - 1,
@@ -35,7 +36,7 @@ pub fn create_mesh_from_field(
 }
 
 pub fn create_mesh_precomputed(
-    field: &FieldPrecomputed,
+    field: &Field,
     min_bound: &(f32, f32, f32),
     max_bound: &(f32, f32, f32),
 ) -> Mesh {
@@ -148,7 +149,7 @@ fn precompute_field(
     min_bound: &(f32, f32, f32),
     max_bound: &(f32, f32, f32),
     cube_count: &(usize, usize, usize),
-) -> FieldPrecomputed {
+) -> Field {
     let corner_counts = (cube_count.0 + 1, cube_count.1 + 1, cube_count.2 + 1);
     let mut field_table = Vec::with_capacity(corner_counts.0);
     for z in 0..corner_counts.2 {
@@ -168,7 +169,7 @@ fn precompute_field(
         }
         field_table.push(slice);
     }
-    FieldPrecomputed(field_table)
+    Field(field_table)
 }
 
 
@@ -422,8 +423,8 @@ mod tests {
 
     }
 
-    fn field_precomputed() -> FieldPrecomputed {
-        let f = FieldPrecomputed(vec![
+    fn field_precomputed() -> Field {
+        let f = Field(vec![
             vec![
                 vec![-1.0, -1.0, -1.0],
                 vec![-1.0, -1.0, -1.0],
