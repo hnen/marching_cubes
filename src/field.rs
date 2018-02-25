@@ -13,6 +13,17 @@ impl Field {
         max_bound: &(f32, f32, f32),
         cube_count: &(usize, usize, usize),
     ) -> Field {
+        Self::from_closure(|x,y,z| field.f(x,y,z), min_bound, max_bound, cube_count)
+    }
+
+    pub fn from_closure<F>(
+        field: F,
+        min_bound: &(f32, f32, f32),
+        max_bound: &(f32, f32, f32),
+        cube_count: &(usize, usize, usize),
+    ) -> Field
+    where F : Fn(f32,f32,f32) -> f32
+    {
         let corner_counts = (cube_count.0 + 1, cube_count.1 + 1, cube_count.2 + 1);
         let mut field_table = Vec::with_capacity(corner_counts.0);
         for z in 0..corner_counts.2 {
@@ -26,7 +37,7 @@ impl Field {
                         min_bound.1 + fy * (max_bound.1 - min_bound.1) / (cube_count.1 as f32),
                         min_bound.2 + fz * (max_bound.2 - min_bound.2) / (cube_count.2 as f32),
                     );
-                    row.push(field.f(fp.0, fp.1, fp.2));
+                    row.push(field(fp.0, fp.1, fp.2));
                 }
                 slice.push(row)
             }
