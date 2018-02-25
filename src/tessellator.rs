@@ -4,26 +4,9 @@ use mesh::Mesh;
 use mesh::Triangle;
 
 use std::collections::HashMap;
-
 use cube::tessellate_corners;
+use field::Field;
 
-pub struct Field(pub Vec<Vec<Vec<f32>>>);
-
-impl Field {
-    pub fn cube_count(&self) -> (usize, usize, usize) {
-        (
-            self.0[0][0].len() - 1,
-            self.0[0].len() - 1,
-            self.0.len() - 1,
-        )
-    }
-    pub fn corner_count(&self) -> (usize, usize, usize) {
-        (self.0[0][0].len(), self.0[0].len(), self.0.len())
-    }
-    pub fn f(&self, x: usize, y: usize, z: usize) -> f32 {
-        self.0[z][y][x]
-    }
-}
 
 pub fn create_mesh_from_field(
     field: &GeomField,
