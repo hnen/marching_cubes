@@ -3,9 +3,13 @@ pub trait GeomField {
     fn f(&self, x: f32, y: f32, z: f32) -> f32;
 }
 
-pub struct Field(pub Vec<Vec<Vec<f32>>>);
+pub struct Field(Vec<Vec<Vec<f32>>>);
 
 impl Field {
+
+    pub fn from_vecs( vecs : Vec<Vec<Vec<f32>>> ) -> Field {
+        Field(vecs)
+    }
 
     pub fn from_geomfield(
         field: &GeomField,
@@ -60,7 +64,4 @@ impl Field {
         self.0[z][y][x]
     }
 }
-
-
-
 

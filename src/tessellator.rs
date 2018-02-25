@@ -375,8 +375,9 @@ mod tests {
 
     }
 
+
     fn field_precomputed() -> Field {
-        let f = Field(vec![
+        let f = Field::from_vecs(vec![
             vec![
                 vec![-1.0, -1.0, -1.0],
                 vec![-1.0, -1.0, -1.0],
