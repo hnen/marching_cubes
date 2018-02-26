@@ -3,8 +3,7 @@
 pub struct Field(Vec<Vec<Vec<f32>>>);
 
 impl Field {
-
-    pub fn from_vecs( vecs : Vec<Vec<Vec<f32>>> ) -> Field {
+    pub fn from_vecs(vecs: Vec<Vec<Vec<f32>>>) -> Field {
         Field(vecs)
     }
 
@@ -14,7 +13,8 @@ impl Field {
         max_bound: &(f32, f32, f32),
         cube_count: &(usize, usize, usize),
     ) -> Field
-    where F : Fn(f32,f32,f32) -> f32
+    where
+        F: Fn(f32, f32, f32) -> f32,
     {
         let corner_counts = (cube_count.0 + 1, cube_count.1 + 1, cube_count.2 + 1);
         let mut field_table = Vec::with_capacity(corner_counts.0);
@@ -52,4 +52,3 @@ impl Field {
         self.0[z][y][x]
     }
 }
-
