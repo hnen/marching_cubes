@@ -8,7 +8,5 @@ mod field;
 mod mesh;
 mod tessellator;
 
-pub use field::GeomField;
 pub use field::Field;
-
 pub use tessellator::create_mesh;

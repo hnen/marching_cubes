@@ -2,35 +2,10 @@
 use mesh::Triangle;
 use mesh::Vertex;
 use mesh::Mesh;
-use field::GeomField;
 
 use tables::VERTS_INSIDE_TO_EDGE_ISECT;
 use tables::EDGE_ISECTS_TO_TRIS;
 use tables::EDGES;
-
-pub fn tessellate_cube(min: &(f32, f32, f32), max: &(f32, f32, f32), field: &GeomField) -> Mesh {
-    let p = [
-        (min.0, min.1, min.2),
-        (max.0, min.1, min.2),
-        (max.0, min.1, max.2),
-        (min.0, min.1, max.2),
-        (min.0, max.1, min.2),
-        (max.0, max.1, min.2),
-        (max.0, max.1, max.2),
-        (min.0, max.1, max.2),
-    ];
-    let f = [
-        field.f(p[0].0, p[0].1, p[0].2),
-        field.f(p[1].0, p[1].1, p[1].2),
-        field.f(p[2].0, p[2].1, p[2].2),
-        field.f(p[3].0, p[3].1, p[3].2),
-        field.f(p[4].0, p[4].1, p[4].2),
-        field.f(p[5].0, p[5].1, p[5].2),
-        field.f(p[6].0, p[6].1, p[6].2),
-        field.f(p[7].0, p[7].1, p[7].2),
-    ];
-    tessellate_corners(&p, &f)
-}
 
 pub fn tessellate_corners(p: &[(f32, f32, f32)], f: &[f32]) -> Mesh {
     let corners_in = (0..8).filter(|i| f[*i as usize] < 0.0).fold(
