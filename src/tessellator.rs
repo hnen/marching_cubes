@@ -310,7 +310,7 @@ mod tests {
         assert_eq!(
             Some(&Vertex(-r, 0.0, 0.0)),
             mesh.0.iter().min_by(
-                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                |&&Vertex(x0, _y0, _z0), &&Vertex(x1, _y1, _z1)| {
                     x0.partial_cmp(&x1).unwrap()
                 },
             )
@@ -318,7 +318,7 @@ mod tests {
         assert_eq!(
             Some(&Vertex(r, 0.0, 0.0)),
             mesh.0.iter().max_by(
-                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                |&&Vertex(x0, _y0, _z0), &&Vertex(x1, _y1, _z1)| {
                     x0.partial_cmp(&x1).unwrap()
                 },
             )
@@ -326,7 +326,7 @@ mod tests {
         assert_eq!(
             Some(&Vertex(0.0, -r, 0.0)),
             mesh.0.iter().min_by(
-                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                |&&Vertex(_x0, y0, _z0), &&Vertex(_x1, y1, _z1)| {
                     y0.partial_cmp(&y1).unwrap()
                 },
             )
@@ -334,7 +334,7 @@ mod tests {
         assert_eq!(
             Some(&Vertex(0.0, r, 0.0)),
             mesh.0.iter().max_by(
-                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                |&&Vertex(_x0, y0, _z0), &&Vertex(_x1, y1, _z1)| {
                     y0.partial_cmp(&y1).unwrap()
                 },
             )
@@ -342,7 +342,7 @@ mod tests {
         assert_eq!(
             Some(&Vertex(0.0, 0.0, -r)),
             mesh.0.iter().min_by(
-                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                |&&Vertex(_x0, _y0, z0), &&Vertex(_x1, _y1, z1)| {
                     z0.partial_cmp(&z1).unwrap()
                 },
             )
@@ -350,7 +350,7 @@ mod tests {
         assert_eq!(
             Some(&Vertex(0.0, 0.0, r)),
             mesh.0.iter().max_by(
-                |&&Vertex(x0, y0, z0), &&Vertex(x1, y1, z1)| {
+                |&&Vertex(_x0, _y0, z0), &&Vertex(_x1, _y1, z1)| {
                     z0.partial_cmp(&z1).unwrap()
                 },
             )

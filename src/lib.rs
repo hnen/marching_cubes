@@ -1,6 +1,4 @@
 #![feature(nll)]
-#![allow(unused_variables)]
-#![allow(dead_code)]
 
 mod tables;
 mod cube;
