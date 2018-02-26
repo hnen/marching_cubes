@@ -119,21 +119,7 @@ fn grid_shared_edge_index(
 mod tests {
     use super::*;
 
-    use field::GeomField;
     use mesh::Vertex;
-
-    struct SphereField(f32);
-    impl SphereField {
-        pub fn new(r: f32) -> SphereField {
-            SphereField(r)
-        }
-    }
-    impl GeomField for SphereField {
-        fn f(&self, x: f32, y: f32, z: f32) -> f32 {
-            let &SphereField(r) = self;
-            (x * x + y * y + z * z).sqrt() - r
-        }
-    }
 
     #[test]
     fn test_edge_index() {
@@ -245,31 +231,30 @@ mod tests {
 
     #[test]
     fn test_sphere() {
-        let sfield = SphereField::new(0.98);
+        //let sfield = SphereField::new(0.98);
+        let r = 0.98;
 
-        let field_table = Field::from_geomfield(&sfield,
+        let field_table = Field::from_closure(
+            |x,y,z| (x*x+y*y+z*z).sqrt() - r,
             &(-1.0, -1.0, -1.0),
             &(1.0, 1.0, 1.0),
             &(50, 50, 50)
         );
-        let mesh = create_mesh(&field_table,
-                               &(-1.0, -1.0, -1.0),
-                               &(1.0, 1.0, 1.0)
-        );
+        let mesh = create_mesh(&field_table, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0));
 
-        assert_is_sphere(&mesh, 0.98);
+        assert_is_sphere(&mesh, r);
     }
 
     #[test]
     fn test_field() {
-        let sfield = SphereField::new(1.0);
-        let field_table = Field::from_geomfield(&sfield,
+        let r = 1.0;
+        let field_table = Field::from_closure(
+            |x,y,z| (x*x+y*y+z*z).sqrt() - r,
             &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0), &(2, 2, 2)
         );
-        let mesh = create_mesh(&field_table,
-                               &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0)
-        );
-        assert_is_octahedron(&mesh, 1.0);
+        let mesh = create_mesh(&field_table, &(-1.0, -1.0, -1.0), &(1.0, 1.0, 1.0));
+
+        assert_is_octahedron(&mesh, r);
     }
 
     #[test]

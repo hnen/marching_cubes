@@ -11,15 +11,6 @@ impl Field {
         Field(vecs)
     }
 
-    pub fn from_geomfield(
-        field: &GeomField,
-        min_bound: &(f32, f32, f32),
-        max_bound: &(f32, f32, f32),
-        cube_count: &(usize, usize, usize),
-    ) -> Field {
-        Self::from_closure(|x,y,z| field.f(x,y,z), min_bound, max_bound, cube_count)
-    }
-
     pub fn from_closure<F>(
         field: F,
         min_bound: &(f32, f32, f32),
