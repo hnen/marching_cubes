@@ -8,3 +8,4 @@ mod tessellator;
 
 pub use field::Field;
 pub use tessellator::create_mesh;
+pub use mesh::Mesh;
